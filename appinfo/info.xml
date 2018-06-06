@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<info xmlns:xsi= "http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="https://apps.nextcloud.com/schema/apps/info.xsd">
+    <id>memopad</id>
+    <name>Memo Pad</name>
+    <summary>This is a simple notebook app.</summary>
+    <description><![CDATA[This is a simple notebook app.]]></description>
+    <version>0.0.2</version>
+    <licence>agpl</licence>
+    <author mail="mengqigu@gmail.com" >Mengqi Gu</author>
+    <namespace>MemoPad</namespace>
+    <category>office</category>
+    <bugs>https://www.mengqi-gu.com</bugs>
+    <dependencies>
+        <nextcloud min-version="13" max-version="14"/>
+    </dependencies>
+    <navigations>
+        <navigation>
+            <name>Memo Pad</name>
+            <route>memopad.page.index</route>
+        </navigation>
+    </navigations>
+</info>

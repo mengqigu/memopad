@@ -1,0 +1,21 @@
+{
+    "name": "Memo Pad",
+    "description": "This is a simple notebook app.",
+    "type": "project",
+    "license": "AGPL",
+    "authors": [
+        {
+            "name": "Mengqi Gu"
+        }
+    ],
+    "require": {},
+    "autoload": {
+        "classmap": [
+            "lib/",
+            "/Users/mengqigu/Sites/nextcloud/lib"
+        ]
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^7"
+    }
+}
