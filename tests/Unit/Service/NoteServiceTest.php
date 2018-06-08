@@ -25,7 +25,8 @@ class NoteServiceTest extends TestCase {
         $note = Note::fromRow([
             'id' => 3,
             'title' => 'yo',
-            'content' => 'nope'
+            'content' => 'nope',
+            'folder' => 'haha'
         ]);
         $this->mapper->expects($this->once())
             ->method('find')
@@ -36,12 +37,13 @@ class NoteServiceTest extends TestCase {
         $updatedNote = Note::fromRow(['id' => 3]);
         $updatedNote->setTitle('title');
         $updatedNote->setContent('content');
+        $updatedNote->setFolder('folder');
         $this->mapper->expects($this->once())
             ->method('update')
             ->with($this->equalTo($updatedNote))
             ->will($this->returnValue($updatedNote));
 
-        $result = $this->service->update(3, 'title', 'content', $this->userId);
+        $result = $this->service->update(3, 'title', 'content', $this->userId, 'folder');
 
         $this->assertEquals($updatedNote, $result);
     }
@@ -57,6 +59,6 @@ class NoteServiceTest extends TestCase {
             ->with($this->equalTo(3))
             ->will($this->throwException(new DoesNotExistException('')));
 
-        $this->service->update(3, 'title', 'content', $this->userId);
+        $this->service->update(3, 'title', 'content', $this->userId, 'folder');
     }
 }

@@ -50,10 +50,12 @@ class NoteApiController extends ApiController {
      *
      * @param string $title
      * @param string $content
+     * @param string $folder
      */
-    public function create($title, $content) {
-        return $this->service->create($title, $content, $this->userId);
+    public function create($title, $content, $folder) {
+        return $this->service->create($title, $content, $this->userId, $folder);
     }
+
 
     /**
      * @CORS
@@ -63,10 +65,11 @@ class NoteApiController extends ApiController {
      * @param int $id
      * @param string $title
      * @param string $content
+     * @param string $folder
      */
-    public function update($id, $title, $content) {
-        return $this->handleNotFound(function () use ($id, $title, $content) {
-            return $this->service->update($id, $title, $content, $this->userId);
+    public function update($id, $title, $content, $folder) {
+        return $this->handleNotFound(function () use ($id, $title, $content, $folder) {
+            return $this->service->update($id, $title, $content, $this->userId, $folder);
         });
     }
 

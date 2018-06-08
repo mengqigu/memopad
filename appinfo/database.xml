@@ -35,6 +35,13 @@
                 <default></default>
                 <notnull>true</notnull>
             </field>
+            <field>
+                <name>folder</name>
+                <type>text</type>
+                <length>200</length>
+                <default></default>
+                <notnull>true</notnull>
+            </field>
         </declaration>
     </table>
 </database>

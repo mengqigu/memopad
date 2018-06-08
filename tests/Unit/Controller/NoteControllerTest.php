@@ -35,12 +35,13 @@ class NoteControllerTest extends TestCase {
         $this->service->expects($this->once())
             ->method('update')
             ->with($this->equalTo(3),
-                    $this->equalTo('title'),
-                    $this->equalTo('content'),
-                   $this->equalTo($this->userId))
+            $this->equalTo('title'),
+            $this->equalTo('content'),
+            $this->equalTo($this->userId),
+            $this->equalTo('folder'))
             ->will($this->returnValue($note));
 
-        $result = $this->controller->update(3, 'title', 'content');
+        $result = $this->controller->update(3, 'title', 'content', 'folder');
 
         $this->assertEquals($note, $result->getData());
     }
@@ -52,7 +53,7 @@ class NoteControllerTest extends TestCase {
             ->method('update')
             ->will($this->throwException(new NotFoundException()));
 
-        $result = $this->controller->update(3, 'title', 'content');
+        $result = $this->controller->update(3, 'title', 'content', 'folder');
 
         $this->assertEquals(Http::STATUS_NOT_FOUND, $result->getStatus());
     }

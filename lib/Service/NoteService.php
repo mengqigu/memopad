@@ -48,19 +48,21 @@ class NoteService {
         }
     }
 
-    public function create($title, $content, $userId) {
+    public function create($title, $content, $userId, $folder) {
         $note = new Note();
         $note->setTitle($title);
         $note->setContent($content);
         $note->setUserId($userId);
+        $note->setFolder($folder);
         return $this->mapper->insert($note);
     }
 
-    public function update($id, $title, $content, $userId) {
+    public function update($id, $title, $content, $userId, $folder) {
         try {
             $note = $this->mapper->find($id, $userId);
             $note->setTitle($title);
             $note->setContent($content);
+            $note->setFolder($folder);
             return $this->mapper->update($note);
         } catch(Exception $e) {
             $this->handleException($e);

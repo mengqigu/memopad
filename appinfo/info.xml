@@ -5,7 +5,7 @@
     <name>Memo Pad</name>
     <summary>This is a simple notebook app.</summary>
     <description><![CDATA[This is a simple notebook app.]]></description>
-    <version>0.0.2</version>
+    <version>0.0.3</version>
     <licence>agpl</licence>
     <author mail="mengqigu@gmail.com" >Mengqi Gu</author>
     <namespace>MemoPad</namespace>
