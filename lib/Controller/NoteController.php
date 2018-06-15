@@ -8,7 +8,6 @@ use OCP\AppFramework\Controller;
 use OCA\MemoPad\Service\NoteService;
 
 class NoteController extends Controller {
-
     private $service;
     private $userId;
 
