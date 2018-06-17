@@ -12,7 +12,8 @@
     "autoload": {
         "classmap": [
             "lib/",
-            "/Users/mengqigu/Sites/nextcloud/lib"
+            "/Users/mengqigu/Sites/nextcloud/lib",
+            "/Users/mengqigu/Sites/nextcloud/apps/memopad/lib"
         ]
     },
     "require-dev": {

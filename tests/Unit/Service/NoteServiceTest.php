@@ -14,6 +14,7 @@ class NoteServiceTest extends TestCase {
     private $userId = 'john';
 
     public function setUp() {
+        print_r(get_declared_classes());
         $this->mapper = $this->getMockBuilder('OCA\MemoPad\Db\NoteMapper')
             ->disableOriginalConstructor()
             ->getMock();
