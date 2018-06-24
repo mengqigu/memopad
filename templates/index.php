@@ -1,7 +1,8 @@
 <?php
 // Include js/script.js and js/handlebars.js
-script('memopad', 'script');
-script('memopad', 'handlebars');
+// script('memopad', 'script');
+// script('memopad', 'handlebars');
+script('memopad', 'bundle');
 
 // Include css/style.css
 style('memopad', 'style');

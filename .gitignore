@@ -1,3 +1,7 @@
 composer.lock
 
 vendor/
+
+node_modules/
+
+js/bundle.js

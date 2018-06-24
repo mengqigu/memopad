@@ -1,0 +1,29 @@
+{
+  "name": "memopad",
+  "version": "1.0.0",
+  "description": "Place this app in **nextcloud/apps/**",
+  "main": "index.js",
+  "directories": {
+    "lib": "lib",
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mengqigu/memopad.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/mengqigu/memopad/issues"
+  },
+  "homepage": "https://github.com/mengqigu/memopad#readme",
+  "devDependencies": {
+    "babel-core": "^6.26.3",
+    "babelify": "^8.0.0",
+    "handlebars": "^4.0.11",
+    "hbsfy": "^2.8.1"
+  }
+}
