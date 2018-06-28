@@ -2,7 +2,7 @@
 // Include js/script.js and js/handlebars.js
 // script('memopad', 'script');
 // script('memopad', 'handlebars');
-script('memopad', 'bundle');
+script('memopad', 'app');
 
 // Include css/style.css
 style('memopad', 'style');

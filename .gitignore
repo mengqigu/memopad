@@ -5,3 +5,5 @@ vendor/
 node_modules/
 
 js/bundle.js
+
+js/app.js
