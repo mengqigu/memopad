@@ -3,6 +3,10 @@ Place this app in **nextcloud/apps/**
 
 ## Building the app
 
+```
+browserify -t babelify -t hbsfy js/view.js js/model.js js/controller.js > js/app.js --debug
+```
+
 The app can be built by using the provided Makefile by running:
 
     make
