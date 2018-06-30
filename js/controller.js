@@ -19,39 +19,51 @@ var Controller = function(model, view) {
 var model = new Model();
 var view = new View();
 
-model.loadAllNotes().done(function(){
-    console.log(model.notes);
-    console.log(model.idToNote);
-
-
-    // model.getNote(1).done(function(response){
-    //     console.log("getNote: ");
-    //     console.log(response);
-    // }).fail(function(){
-    //     console.log("getNote failed");
-    // });
-
-    model.createNote("dfefef  t", "df pin efeefepin", "dfd").done(function(response) {
-        console.log(response);
-        console.log(model.idToNote);
-    });
-
-}).fail(function() {
-    console.log(error);
-});
-
-// model.loadAllNotes().then(function() {
-//     console.log("Getting note 1...");
-//     return model.getNote(1, false);
-// }).then(function(getNoteResponse) {
-//     console.log("Updating note 1...");
-//     return model.updateNote(1, "updated", "upda", "uptd");
-// }).then(function(updateNoteResponse) {
-//     console.log("Updated note!");
-//     console.log(updateNoteResponse);
+// model.loadAllNotes().done(function(){
+//     console.log(model.notes);
+//     console.log(model.idToNote);
+//
+//
+//     // model.getNote(1).done(function(response){
+//     //     console.log("getNote: ");
+//     //     console.log(response);
+//     // }).fail(function(){
+//     //     console.log("getNote failed");
+//     // });
+//
+//     model.createNote("dfefef  t", "df pin efeefepin", "dfd").done(function(response) {
+//         console.log(response);
+//         console.log(model.idToNote);
+//     });
+//
 // }).fail(function() {
-//     console.log("Error");
-// })
+//     console.log(error);
+// });
+
+var idUnderTest = 11;
+model.loadAllNotes().then(function() {
+    console.log("Creating a new Note...");
+    return model.createNote("created", "for", "this test");
+}).then(function(response) {
+    console.log("Getting newly created note...");
+    console.log(response);
+    return model.getNote(idUnderTest);
+}).then(function(getNoteResponse) {
+    console.log("Updating note 1...");
+    return model.updateNote(idUnderTest, "updated", "upda", "uptd");
+}).then(function(updateNoteResponse) {
+    console.log("Updated note!");
+    console.log(updateNoteResponse);
+    return model.deleteNote(idUnderTest);
+}).then(function(deleteNoteResponse) {
+    console.log("DELETE succeeded!");
+    console.log(deleteNoteResponse);
+    return model.loadAllNotes();
+}).then(function() {
+    console.log(model.idToNote);
+}).fail(function() {
+    console.log("Error");
+})
 
 
 // view.render(model);

@@ -37,7 +37,8 @@ function Model() {
 
 /**
  * Load all the notes in the backend to the JS environment.
- * Endpoint used: GET /notes
+ * Endpoint used: GET /notes.
+ * Note: when resolving the Promise, we are not returning thre response. Should we?
  * @return {Promise} returns a jQuery Promise that will be resolved/rejected when success/failure
  */
 Model.prototype.loadAllNotes = function() {
@@ -70,7 +71,7 @@ Model.prototype.loadAllNotes = function() {
  * to maintain consistency of the interface of the class's methods.
  * @param  {int} id id of the Note
  * @param  {boolean} doesQueryBackend if set to true, query the note from backend
- * @return {promise} returns a jQuery Promise returning the Note object data.
+ * @return {Promise} returns a jQuery Promise returning the Note object data.
  */
 Model.prototype.getNote = function(id, doesQueryBackend = false) {
     var def = $.Deferred();
@@ -106,7 +107,7 @@ Model.prototype.getNote = function(id, doesQueryBackend = false) {
  * @param  {string} title   title of the notebook
  * @param  {string} content notebook content
  * @param  {string} folder  folder of the notebook
- * @return {promise} returns a jQuery Promise
+ * @return {Promise} returns a jQuery Promise
  */
 Model.prototype.createNote = function(title, content, folder) {
     var body = {
@@ -169,6 +170,38 @@ Model.prototype.updateNote = function(id, title, content, folder) {
     });
 
     return def.promise();
+}
+
+Model.prototype.deleteNote = function(id) {
+    var def = $.Deferred();
+    var self = this;
+
+    this.getNote(id).then(function(noteResponse) {
+        console.log("Trying to delete via calling the backend");
+        return $.ajax({
+               url: self.baseUrl + "/" + id,
+               method: 'DELETE',
+        });
+    }).then(function(response) {
+        console.log("Delete successful: " + response);
+
+        // If the deletion is successful, remove the Note in memory
+        self.idToNote.delete(id);
+        def.resolve(response);
+    }).fail(function() {
+        console.log("Error when deleting note");
+        def.reject();
+    });
+
+    return def.promise();
+}
+
+/**
+ * Obtain the in-memory storage of Notes as a list. No calls to the backend. No promise needed.
+ * @return {Note[]} list of Note objects stored in the JS environment
+ */
+Model.prototype.getNoteList = function() {
+
 }
 
 Model.prototype.getContent = function() {
