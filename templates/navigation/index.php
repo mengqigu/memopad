@@ -10,7 +10,7 @@
 </ul> -->
 <div style="display:none" id="new-note-string"><?php p($l->t('New note')); ?></div>
 
-<script id="navigation-tpl" type="text/x-handlebars-template">
+<!-- <script id="navigation-tpl" type="text/x-handlebars-template">
     <li id="new-note"><a href="#"><?php p($l->t('Add note')); ?></a></li>
     {{#each notes}}
         <li class="note with-menu {{#if active}}active{{/if}}" data-id="{{ id }}">
@@ -28,6 +28,6 @@
             </div>
         </li>
     {{/each}}
-</script>
+</script> -->
 
 <ul></ul>

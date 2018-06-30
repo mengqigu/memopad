@@ -201,7 +201,13 @@ Model.prototype.deleteNote = function(id) {
  * @return {Note[]} list of Note objects stored in the JS environment
  */
 Model.prototype.getNoteList = function() {
+    var result = [];
 
+    for (let note of this.idToNote.values()) {
+        result.push(note);
+    }
+
+    return result;
 }
 
 Model.prototype.getContent = function() {

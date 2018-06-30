@@ -22,9 +22,16 @@ View.prototype.renderContent = function(model) {
 }
 
 View.prototype.renderNavigation = function(model) {
-    var html = "";
+    var template = require("../templates/navigation/navigation.hbs");
 
-    $("app-navigation ul").html(html);
+    var context2 = {
+        notes: model.getNoteList()
+    }
+    var html = template(context2);
+
+    console.log(html);
+
+    $("#app-navigation ul").html(html);
 }
 
 View.prototype.render = function(model) {
