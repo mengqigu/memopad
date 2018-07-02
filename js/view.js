@@ -8,17 +8,14 @@
 var View = function(model) {
 }
 
-View.prototype.renderContent = function(model) {
+View.prototype.renderContent = function(model, noteId) {
     var template = require("../templates/content/content.hbs");
-    // var context2 = {
-    //     people: [
-    //         "Yehuda Katz",
-    //         "12345 Johnson",
-    //         "Charles Jolley"
-    //     ]
-    // }
 
-    $('#editor').html(template(model.getContent()));
+    model.getNote(noteId, false).done(function(noteResponse) {
+        $('#editor').html(template(noteResponse));
+    }).fail(function() {
+        console.log("Failed to load note");
+    })
 }
 
 View.prototype.renderNavigation = function(model) {
@@ -28,8 +25,6 @@ View.prototype.renderNavigation = function(model) {
         notes: model.getNoteList()
     }
     var html = template(context2);
-
-    console.log(html);
 
     $("#app-navigation ul").html(html);
 }

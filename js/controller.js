@@ -12,15 +12,30 @@ var View = require("./view");
  * @param  {view} view  the view
  */
 var Controller = function(model, view) {
-    this._model = model;
-    this._view = view;
+    this.model = model;
+    this.view = view;
 };
+
+Controller.prototype.registerNavigationControl = function() {
+    var self = this;
+    $(".note-nav-entry > a").click(function() {
+        // The navigation entry is a direct parent of the clickable area <a> element
+        // Read the clicked note id from the data attribute data-note-id
+        var noteId = $(this).parent().data("note-id");
+        self.view.renderContent(self.model, parseInt(noteId, 10));
+        console.log(noteId);
+    });
+}
 
 var model = new Model();
 var view = new View();
+var controller = new Controller(model, view);
 
 model.loadAllNotes().then(function() {
     view.renderNavigation(model);
+    view.renderContent(model, 2);
+
+    controller.registerNavigationControl();
 }).fail(function() {
     console.log(error);
 });
