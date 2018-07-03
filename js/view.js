@@ -3,6 +3,8 @@
 
 /**
  * Constructor for the view object.
+ * View should never remove the DOM element app-navigation and app-content.
+ * These DOM elements are used for delegating events since their descendent changes dynamically.
  * NOTE: use function expression so that the function is in local scope
  */
 var View = function(model) {

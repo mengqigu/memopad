@@ -16,14 +16,34 @@ var Controller = function(model, view) {
     this.view = view;
 };
 
+/**
+ * Add user interaction handlers for widgets in the app.
+ * Use #app-navigation and #app-content as parents for event delegation.
+ * @return {[type]} [description]
+ */
 Controller.prototype.registerNavigationControl = function() {
     var self = this;
-    $(".note-nav-entry > a").click(function() {
-        // The navigation entry is a direct parent of the clickable area <a> element
-        // Read the clicked note id from the data attribute data-note-id
+
+    $("#app-navigation").on("click", ".note-nav-link", function(event) {
+        event.preventDefault();
         var noteId = $(this).parent().data("note-id");
         self.view.renderContent(self.model, parseInt(noteId, 10));
-        console.log(noteId);
+    });
+
+    // Delegate the save event since the save button is dynamically generated.
+    $( "#app-content" ).on( "click", ".note-save", function( event ) {
+        var newContent = $('#editor .cell-content').val();
+        var newTitle = $("#editor .cell-title").val();
+        var newFolder = "default";
+        var id = parseInt($(this).data("note-id"), 10);
+        console.log("Saving note...%s, %s, %s, %d", newTitle, newContent, newFolder, id);
+        self.model.updateNote(id, newTitle, newContent, newFolder).done(function() {
+            self.view.renderContent(self.model, id);
+            // TODO: regenerate navigation only when the title is changed
+            self.view.renderNavigation(self.model);
+        }).fail(function() {
+            console.log("Saving failed");
+        });
     });
 }
 
