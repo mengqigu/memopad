@@ -36,6 +36,16 @@ function Model() {
 }
 
 /**
+ * Get the first id of the note ids.
+ * TODO: handle case when no ids at all
+ * @return {int} id of the note
+ */
+Model.prototype.getFirstId = function() {
+    var itr = this.idToNote.keys();
+    return itr.next().value
+}
+
+/**
  * Load all the notes in the backend to the JS environment.
  * Endpoint used: GET /notes.
  * Note: when resolving the Promise, we are not returning thre response. Should we?
@@ -177,14 +187,11 @@ Model.prototype.deleteNote = function(id) {
     var self = this;
 
     this.getNote(id).then(function(noteResponse) {
-        console.log("Trying to delete via calling the backend");
         return $.ajax({
                url: self.baseUrl + "/" + id,
                method: 'DELETE',
         });
     }).then(function(response) {
-        console.log("Delete successful: " + response);
-
         // If the deletion is successful, remove the Note in memory
         self.idToNote.delete(id);
         def.resolve(response);

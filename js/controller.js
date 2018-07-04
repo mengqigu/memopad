@@ -36,13 +36,39 @@ Controller.prototype.registerNavigationControl = function() {
         var newTitle = $("#editor .cell-title").val();
         var newFolder = "default";
         var id = parseInt($(this).data("note-id"), 10);
-        console.log("Saving note...%s, %s, %s, %d", newTitle, newContent, newFolder, id);
+        // console.log("Saving note...%s, %s, %s, %d", newTitle, newContent, newFolder, id);
         self.model.updateNote(id, newTitle, newContent, newFolder).done(function() {
             self.view.renderContent(self.model, id);
             // TODO: regenerate navigation only when the title is changed
             self.view.renderNavigation(self.model);
         }).fail(function() {
             console.log("Saving failed");
+        });
+    });
+
+    // Delegate the delete notebook preventDefault
+    $("#app-navigation").on("click", ".icon-delete", function(event) {
+        var id = parseInt($(this).data("note-id"), 10);
+        self.model.deleteNote(id).then(function(response) {
+            self.view.renderNavigation(self.model);
+
+            // TODO: when a note is delete, display first note if the deleted note's in editor view.
+            // Else, maintain the editor view
+            self.view.renderContent(self.model, self.model.getFirstId());
+        }).fail(function(){
+            console.log("Deleting a note fails");
+        })
+    });
+
+    // Delegate the new notebook creation event
+    $("#app-navigation").on("click", ".note-nav-new", function(event) {
+        self.model.createNote("New Note", "", "default").then(function(response) {
+            console.log(response);
+            var id = response.id;
+            self.view.renderContent(self.model, id);
+            self.view.renderNavigation(self.model);
+        }).fail(function() {
+            console.log("Creating new note failed");
         });
     });
 }
