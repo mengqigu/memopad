@@ -36,14 +36,38 @@ Controller.prototype.registerNavigationControl = function() {
         var newTitle = $("#editor .cell-title").val();
         var newFolder = "default";
         var id = parseInt($(this).data("note-id"), 10);
-        // console.log("Saving note...%s, %s, %s, %d", newTitle, newContent, newFolder, id);
-        self.model.updateNote(id, newTitle, newContent, newFolder).done(function() {
+
+        // Compare what exactly is changed in this edit
+        var isAnythingChanged = false;
+        var isTitleChanged = false;
+
+        self.model.getNote(id, false).then(function(response) {
+            if (response.title !== newTitle) {
+                isTitleChanged = true;
+                isAnythingChanged = true;
+            } else {
+                isAnythingChanged =
+                    (response.content !== newContent) || (response.folder !== newFolder);
+            }
+
+            // Return a synchronous value to chain the next promise handler
+            return response;
+        }).then(function(response) {
+            if (!isAnythingChanged) {
+                return response;
+            } else {
+                return self.model.updateNote(id, newTitle, newContent, newFolder);
+            }
+        }).then(function(updateResponse) {
+            if (isTitleChanged) {
+                self.view.renderNavigation(self.model);
+            }
             self.view.renderContent(self.model, id);
-            // TODO: regenerate navigation only when the title is changed
-            self.view.renderNavigation(self.model);
         }).fail(function() {
             console.log("Saving failed");
-        });
+        })
+
+        // console.log("Saving note...%s, %s, %s, %d", newTitle, newContent, newFolder, id);
     });
 
     // Delegate the delete notebook preventDefault
