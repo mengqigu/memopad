@@ -10,6 +10,16 @@
 var View = function(model) {
 }
 
+/**
+ * Return the id of the current active note.
+ * Note that we store the note id in data field data-note-id in our front-end elements.
+ * Therefore, we implement the method to obtain this id in View class.
+ * @return {int} the id of the current active note
+ */
+View.prototype.getActiveNoteId = function() {
+    return parseInt($(".note-title").data("note-id"), 10);
+}
+
 View.prototype.renderContent = function(model, noteId) {
     var template = require("../templates/content/content.hbs");
 

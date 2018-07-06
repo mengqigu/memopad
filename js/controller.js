@@ -19,23 +19,22 @@ var Controller = function(model, view) {
 /**
  * Add user interaction handlers for widgets in the app.
  * Use #app-navigation and #app-content as parents for event delegation.
- * @return {[type]} [description]
+ * @return {void}
  */
 Controller.prototype.registerNavigationControl = function() {
     var self = this;
 
-    $("#app-navigation").on("click", ".note-nav-link", function(event) {
-        event.preventDefault();
-        var noteId = $(this).parent().data("note-id");
-        self.view.renderContent(self.model, parseInt(noteId, 10));
-    });
-
-    // Delegate the save event since the save button is dynamically generated.
-    $( "#app-content" ).on( "click", ".note-save", function( event ) {
+    // Implement autosave:
+    // - When user stops typing for 750 milliseconds
+    // - When user closes/refreshes the page or leaves the current app (to vist another app/url)
+    // - When user leaves the current note and opens another note
+    // NOTE: this handler must be called while the note to be saved is still active/displayed!
+    var savingHandler = function() {
         var newContent = $('#editor .cell-content').val();
         var newTitle = $("#editor .cell-title").val();
         var newFolder = "default";
-        var id = parseInt($(this).data("note-id"), 10);
+
+        var id = self.view.getActiveNoteId();
 
         // Compare what exactly is changed in this edit
         var isAnythingChanged = false;
@@ -62,12 +61,35 @@ Controller.prototype.registerNavigationControl = function() {
             if (isTitleChanged) {
                 self.view.renderNavigation(self.model);
             }
-            self.view.renderContent(self.model, id);
+
+            // TODO: this is probably not necessary
+            // self.view.renderContent(self.model, id);
         }).fail(function() {
             console.log("Saving failed");
         })
+    };
 
-        // console.log("Saving note...%s, %s, %s, %d", newTitle, newContent, newFolder, id);
+    var autosaveTimerId;
+    $("#app-content").on("keypress", ".autosave-textarea", function(event) {
+        if (autosaveTimerId !== undefined) {
+            clearTimeout(autosaveTimerId);
+        }
+        autosaveTimerId = setTimeout(function(){
+            savingHandler();
+        }, 750);
+    });
+
+    // Before refreshing, closing window, or switching to another app
+    window.onbeforeunload = function(){
+       savingHandler();
+    }
+
+    // Switching between notes
+    $("#app-navigation").on("click", ".note-nav-link", function(event) {
+        event.preventDefault();
+        savingHandler();
+        var newNoteId = $(this).parent().data("note-id");
+        self.view.renderContent(self.model, parseInt(newNoteId, 10));
     });
 
     // Delegate the delete notebook preventDefault
