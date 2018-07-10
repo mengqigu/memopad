@@ -16,6 +16,86 @@ var Controller = function(model, view) {
     this.view = view;
 };
 
+Controller.prototype.registerEditorControl = function() {
+    var self = this;
+
+    /**
+    * The one and only active cell in the current active notebook.
+    * Is of type jQuery element.
+    */
+    var activeCell = $(".cell");
+
+
+    // Handle generated cell divs when new cell is created or cell is removed (via backspace).
+    // When backsapce up to the previous cell, we need to
+    // - Handle the new merged cell
+    // - Remove the generated <span> and its style
+    // NOTE: MutationObserver only takes DOM element. Convert jQuery element <-> DOM element:
+    // jelem = $(htmlElem); htmlElem = jelem[0];
+    var mutationObserver = new MutationObserver(function(mutations) {
+        mutations.forEach(function(mutationRecord) {
+            console.log(mutationRecord);
+            if ((mutationRecord.type === "childList")
+                && (mutationRecord.target === $("#note-content-editor")[0])) {
+
+                // TODO: handle case when we have >1 nodes in the list
+                if (mutationRecord.addedNodes.length === 0) {
+                    // A cell is deleted via back space and content is merged with previous cell
+                    var newCell = $(mutationRecord.previousSibling);
+                } else {
+                    // A new cell is added via pressing enter
+                    var addedDomNode = mutationRecord.addedNodes[0];
+                    var newCell = $(addedDomNode);
+                }
+
+                // HTML cleaning algorithm for back space removing cell. Leave it here so that is
+                // also executed for new cells, unless we observe bugs during new cell creation.
+
+                // Step 1: remove all span tags in the new cell
+                newCell.find("span").contents().unwrap();
+
+                // Step 2: normalize text that are unwrapped from the span children
+                // https://developer.mozilla.org/en-US/docs/Web/API/Node/normalize
+                newCell[0].normalize();
+
+                // Step 3: remove all style attributes for children and descendents
+                // NOTE: test this by back space deleting a bold cell
+                newCell.find('*').removeAttr('style');
+
+                // Debugging new cell update
+                activeCell.css('background-color', 'white');
+
+                if (activeCell.hasClass("cell-header")) {
+                    newCell.removeClass("cell-header");
+                }
+                activeCell = newCell;
+            }
+        });
+
+        activeCell.css('background-color', 'red');
+    });
+
+    mutationObserver.observe($("#note-content-editor")[0], {
+        attributes: true,
+        characterData: true,
+        childList: true,
+        subtree: false,
+        attributeOldValue: true,
+        characterDataOldValue: true
+    });
+
+    // TODO: this only works when clicking inside the editor div.
+    // However, clicking in the left/right margin can also change the caret position.
+    // We need to either handle this and update the active cell, or disable clicking outside (like Paper)
+    $("#app-content").on("click", ".cell", function(event) {
+        // For debuggin active cell update
+        activeCell.css('background-color', 'white');
+        activeCell = $(this);
+        activeCell.css('background-color', 'red');
+        console.log(activeCell.html());
+    });
+}
+
 /**
  * Add user interaction handlers for widgets in the app.
  * Use #app-navigation and #app-content as parents for event delegation.
@@ -81,6 +161,7 @@ Controller.prototype.registerNavigationControl = function() {
 
     // Before refreshing, closing window, or switching to another app
     window.onbeforeunload = function(){
+        // TODO: close the mutation observer
        savingHandler();
     }
 
@@ -128,6 +209,7 @@ model.loadAllNotes().then(function() {
     view.renderContent(model, 2);
 
     controller.registerNavigationControl();
+    controller.registerEditorControl();
 }).fail(function() {
     console.log(error);
 });

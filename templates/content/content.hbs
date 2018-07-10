@@ -1,4 +1,16 @@
-<h1 class="note-title" data-note-id="{{ id }}"><textarea class="cell-title autosave-textarea">{{ title }}</textarea></h1>
-<!-- <span class="note-save" data-note-id="{{ id }}">Save</span> -->
+<!-- <h1 class="note-title" data-note-id="{{ id }}"><textarea class="cell-title autosave-textarea">{{ title }}</textarea></h1> -->
 
-<div class="note-input" data-note-id="{{ id }}"><textarea class="cell-content autosave-textarea">{{ content }}</textarea></div>
+<!-- <div class="note-input" data-note-id="{{ id }}"><textarea class="cell-content autosave-textarea">{{ content }}</textarea></div> -->
+
+<div class="note-editor">
+    <div contenteditable="true" id="note-title-editor" class="content-editor">
+        <div class="cell-title note-title" data-note-id="{{ id }}">
+            {{ title }}
+        </div>
+    </div>
+    <div contenteditable="true" id="note-content-editor" class="content-editor">
+        <div class="cell">
+            <br>
+        </div>
+    </div>
+</div>

@@ -44,3 +44,44 @@
 .memopad-line {
 
 }
+
+.note-editor {
+    height: 100%;
+}
+
+.iframe-editor {
+    /* margin: 0 100px; */
+    padding: 0 100px;
+    height: 100%;
+    width: 100%;
+    /* width: 100%; */
+}
+
+/**
+ * Next cloud seems to be definging css for content-editable divs already. Overwriting it for now.
+ */
+#note-title-editor {
+    /* margin: 0 100px; */
+    padding: 0 100px;
+    height: 80px;
+    width: 100%;
+    border: none !important;
+    /* width: 100%; */
+}
+
+#note-content-editor {
+    /* margin: 0 100px; */
+    padding: 0 100px;
+    height: 100%;
+    width: 100%;
+    border: none !important;
+    /* width: 100%; */
+}
+
+.cell-title {
+    font-size: 50px;
+}
+
+.cell-header {
+    font-size: 20px;
+}

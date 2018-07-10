@@ -21,10 +21,15 @@ View.prototype.getActiveNoteId = function() {
 }
 
 View.prototype.renderContent = function(model, noteId) {
+    // TODO: there is an extra </div> in the content. Not sure where it is introduced
     var template = require("../templates/content/content.hbs");
 
     model.getNote(noteId, false).done(function(noteResponse) {
         $('#editor').html(template(noteResponse));
+
+        // TODO: refactor the rte component to make it more maintainable
+        // $("#note-iframe-editor").contents().find("body").html(noteResponse.title);
+        $("#note-iframe-editor").contents().prop('designMode','on');
     }).fail(function() {
         console.log("Failed to load note");
     })
