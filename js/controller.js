@@ -16,15 +16,16 @@ var Controller = function(model, view) {
     this.view = view;
 };
 
+/**
+ * Implement the controller logic for the WYSIWYG editor.
+ * @return {void}
+ */
 Controller.prototype.registerEditorControl = function() {
     var self = this;
 
-    /**
-    * The one and only active cell in the current active notebook.
-    * Is of type jQuery element.
-    */
-    var activeCell = $(".cell");
-
+    // The one and only active cell in the current active notebook. Is of type jQuery element.
+    // NOTE: we need to maintain the invariant that every notebook/ new notebook has >= 1 cell.
+    var activeCell = $($(".cell")[0]);
 
     // Handle generated cell divs when new cell is created or cell is removed (via backspace).
     // When backsapce up to the previous cell, we need to
@@ -35,6 +36,10 @@ Controller.prototype.registerEditorControl = function() {
     var mutationObserver = new MutationObserver(function(mutations) {
         mutations.forEach(function(mutationRecord) {
             console.log(mutationRecord);
+            // TODO: observe childlist mutation for #not-content-editor's subtrees
+            // I.E., when we remove <b> or <i> tags, we will have adjacent text nodes
+            // However, to many events were fired for one such operation. We need to find a better way
+
             if ((mutationRecord.type === "childList")
                 && (mutationRecord.target === $("#note-content-editor")[0])) {
 
@@ -58,41 +63,88 @@ Controller.prototype.registerEditorControl = function() {
                 // https://developer.mozilla.org/en-US/docs/Web/API/Node/normalize
                 newCell[0].normalize();
 
-                // Step 3: remove all style attributes for children and descendents
+                // Step 3: remove all style attributes for new cell and its and descendents
                 // NOTE: test this by back space deleting a bold cell
                 newCell.find('*').removeAttr('style');
+                newCell.removeAttr("style");
 
                 // Debugging new cell update
-                activeCell.css('background-color', 'white');
+                activeCell.removeClass("cell-active");
 
-                if (activeCell.hasClass("cell-header")) {
-                    newCell.removeClass("cell-header");
+                // TODO: handle new cell creation, reset style to default when creating a new
+                // cell from a cell with header styles (i.e., .cell-header)
+                if (activeCell.hasClass("cell-header1")) {
+                    newCell.removeClass("cell-header1");
                 }
+
+                if (activeCell.hasClass("cell-header2")) {
+                    newCell.removeClass("cell-header2");
+                }
+
                 activeCell = newCell;
             }
         });
 
-        activeCell.css('background-color', 'red');
+        activeCell.addClass("cell-active");
     });
 
+    // We observe only children for #note-content-editor for now
     mutationObserver.observe($("#note-content-editor")[0], {
-        attributes: true,
-        characterData: true,
+        attributes: false,
+        characterData: false,
         childList: true,
         subtree: false,
-        attributeOldValue: true,
-        characterDataOldValue: true
+        attributeOldValue: false,
+        characterDataOldValue: false
     });
 
+    // Update the active cell to whichever cell the user clicks on
     // TODO: this only works when clicking inside the editor div.
     // However, clicking in the left/right margin can also change the caret position.
     // We need to either handle this and update the active cell, or disable clicking outside (like Paper)
     $("#app-content").on("click", ".cell", function(event) {
         // For debuggin active cell update
-        activeCell.css('background-color', 'white');
+        activeCell.removeClass("cell-active");
         activeCell = $(this);
-        activeCell.css('background-color', 'red');
+        activeCell.addClass("cell-active");
         console.log(activeCell.html());
+    });
+
+    // Handles the toolbar buttons
+    $("#app-content").on("click", "#note-toolbar-h1", function(event) {
+        // For debuggin active cell update
+        event.preventDefault();
+        var headerClass = "cell-header1";
+
+        // Toggle header class
+        if (activeCell.hasClass(headerClass)) {
+            activeCell.removeClass(headerClass);
+        } else {
+            activeCell.addClass(headerClass);
+        }
+
+        // Make sure the cell doesn't have any other header classes
+        if (activeCell.hasClass("cell-header2")) {
+            activeCell.removeClass("cell-header2");
+        }
+    });
+
+    $("#app-content").on("click", "#note-toolbar-h2", function(event) {
+        // For debuggin active cell update
+        event.preventDefault();
+        var headerClass = "cell-header2";
+
+        // Toggle header class
+        if (activeCell.hasClass(headerClass)) {
+            activeCell.removeClass(headerClass);
+        } else {
+            activeCell.addClass(headerClass);
+        }
+
+        // Make sure the cell doesn't have any other header classes
+        if (activeCell.hasClass("cell-header1")) {
+            activeCell.removeClass("cell-header1");
+        }
     });
 }
 

@@ -33,10 +33,6 @@
     height: 44px;
 }
 
-.cell-title {
-    height: 44px;
-}
-
 .note-save {
     background-color: #999999;
 }
@@ -58,6 +54,29 @@
 }
 
 /**
+ * Parent of #note-title-editor and #note-content-editor.
+ * Also parent of the side toolbar. Set to position: absolute so that we can position the toolbar
+ * @type {[type]}
+ */
+.note-editor {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+}
+
+/**
+ * This div NEED to be a child of .note-editor.
+ * @type {[type]}
+ */
+#note-toolbar {
+    position:absolute;
+    right: 0px;
+    top: 0px;
+    width: 45px;
+    height: 100%;
+}
+
+/**
  * Next cloud seems to be definging css for content-editable divs already. Overwriting it for now.
  */
 #note-title-editor {
@@ -72,16 +91,27 @@
 #note-content-editor {
     /* margin: 0 100px; */
     padding: 0 100px;
-    height: 100%;
+    /* NOTE: the height should be parent 100% - height of #note-title-editor */
+    height: 100% - 80px;
     width: 100%;
     border: none !important;
     /* width: 100%; */
 }
 
-.cell-title {
-    font-size: 50px;
+.cell {
 }
 
-.cell-header {
+.cell-title {
+    font-size: 50px;
+    height: 50px;
+}
+
+.cell-header1 {
+    font-size: 30px;
+    height: 30px;
+}
+
+.cell-header2 {
     font-size: 20px;
+    height: 20px;
 }
