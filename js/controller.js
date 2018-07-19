@@ -25,7 +25,11 @@ Controller.prototype.registerEditorControl = function() {
 
     // The one and only active cell in the current active notebook. Is of type jQuery element.
     // NOTE: we need to maintain the invariant that every notebook/ new notebook has >= 1 cell.
+    // TODO: make sure that we can never remove the only cell left <-> we always have >=1 cell
     var activeCell = $($(".cell")[0]);
+    activeCell.addClass("cell-active");
+
+    // TODO: also set the cell-active class? Or is this class only for debugg?
 
     // Handle generated cell divs when new cell is created or cell is removed (via backspace).
     // When backsapce up to the previous cell, we need to
@@ -39,7 +43,6 @@ Controller.prototype.registerEditorControl = function() {
             // TODO: observe childlist mutation for #not-content-editor's subtrees
             // I.E., when we remove <b> or <i> tags, we will have adjacent text nodes
             // However, to many events were fired for one such operation. We need to find a better way
-
             if ((mutationRecord.type === "childList")
                 && (mutationRecord.target === $("#note-content-editor")[0])) {
 
@@ -53,20 +56,40 @@ Controller.prototype.registerEditorControl = function() {
                     var newCell = $(addedDomNode);
                 }
 
-                // HTML cleaning algorithm for back space removing cell. Leave it here so that is
+                // HTML cleaning algorithm for backspace removing cell. Leave it here so that is
                 // also executed for new cells, unless we observe bugs during new cell creation.
 
-                // Step 1: remove all span tags in the new cell
-                newCell.find("span").contents().unwrap();
+                // Step 1: remove all regular span tags (not .cell-hilite) spans in the new cell
+                // TODO: BUG! when a cell with only hilite span was backspace delted, the new span
+                // in the previous cell doesn't have .cell-hilite anymore. This code removes hilite
+                // when a cell is completely hilited and backspace deleted into the previous cell
+                newCell.find("span").not(".cell-hilite").contents().unwrap();
+
+                // Step 1.1: unwrap empty spans, with or without .cell.hilite, to clear hilite
+                // TODO: this fails when the new span contains only <br> and won't clear hilite
+                newCell.find("span").filter(function() {
+                    return $(this).text() === "";
+                }).contents().unwrap();
+
+                // Step 1.2: uwrap spans with style attribute background-color: white
+                newCell.find("span").filter(function() {
+                    // Filter to select all spans that have background color set to white
+                    return $(this).css("backgroundColor") === "white";
+                }).contents().unwrap();
 
                 // Step 2: normalize text that are unwrapped from the span children
                 // https://developer.mozilla.org/en-US/docs/Web/API/Node/normalize
                 newCell[0].normalize();
 
-                // Step 3: remove all style attributes for new cell and its and descendents
+                // Step 3: remove style attr, except bkg-color, for the new cell and descendents
+                // Invariant: all cell-hilite and only the cell-hilite span has style attribute
+                // NOTE: we remove all style attr first and add the bkg-color back for cell-hilite
+                // NOTE: cell-hilite spans with white background color already unwrapped in step 1.2
+                // TODO: Need to preserve the hilite span's cell
                 // NOTE: test this by back space deleting a bold cell
-                newCell.find('*').removeAttr('style');
                 newCell.removeAttr("style");
+                newCell.find('*').removeAttr('style');
+                newCell.find(".cell-hilite").css("backgroundColor", "red");
 
                 // Debugging new cell update
                 activeCell.removeClass("cell-active");
@@ -89,6 +112,7 @@ Controller.prototype.registerEditorControl = function() {
     });
 
     // We observe only children for #note-content-editor for now
+    // TODO: Disable this when debugging cellHiliteObserver
     mutationObserver.observe($("#note-content-editor")[0], {
         attributes: false,
         characterData: false,
@@ -145,6 +169,60 @@ Controller.prototype.registerEditorControl = function() {
         if (activeCell.hasClass("cell-header1")) {
             activeCell.removeClass("cell-header1");
         }
+    });
+
+    // Highlight the selected text in the current active cell. Algorithm:
+    // - Observe the mutations for the active cell. Mark newly added span with class .span-hilite
+    // - When new cell/backspace delte cell, do NOT purge non-empty span with class .span-hilite
+    // - When backspace delete cell, remove all style for .span-hilite other than background-color
+    // TODO: now, if we new line after a hilite, the hilite is canceled. We need to decide if we
+    // want to keep the hilite when we are typing right after the hilite span in the same cell
+    $("#app-content").on("click", "#note-toolbar-hilite", function(event) {
+        event.preventDefault();
+
+        // TODO: does this work? If this function is invoked twice before first returned, will
+        // hiliteCell be overwritten?
+
+        // Listen for new children span created in the new cell. Add cell-hilite claass for them
+        var cellHiliteObserver = new MutationObserver(function() {
+            // Use IIFE to return the callback function in order to seal current value of activeCell
+            // NOTE: current means when the button is clicked and the MutationObserver is created.
+            var hiliteCell = activeCell;
+
+            // Turns out MutationObserver passes itself to the callback
+            // https://stackoverflow.com/questions/41323897/disconnect-mutation-observer-from-callback-function
+            return function(mutations, thisObserver) {
+                // In this callback, hiliteCell will always have the initial value of activeCell
+                // NOTE: this callback is async. Initial means when the MutationObserver is created.
+                mutations.forEach(function(mutationRecord) {
+                    // It seems that when a hilite is added, a span is created, then removed, then
+                    // another span is created. We probably don't need to distinguish between these
+                    // 2 spans when adding our highlight class to the span.
+                    if (mutationRecord.addedNodes.length === 1) {
+                        var addedNode = $(mutationRecord.addedNodes[0]);
+                        if (addedNode.is("span")) {
+                            addedNode.addClass("cell-hilite");
+                        }
+                    }
+                });
+
+                // For each hilite command on each cell, we just need to set the span class once.
+                thisObserver.disconnect();
+            }
+        }());
+
+        // When we are highting, we are always highliting the active cell
+        cellHiliteObserver.observe(activeCell[0], {
+            attributes: false,
+            characterData: false,
+            childList: true,
+            subtree: false,
+            attributeOldValue: false,
+            characterDataOldValue: false
+        });
+
+        // TODO: this doesn't clear the hilite color when set twice
+        document.execCommand("hiliteColor", false, "red");
     });
 }
 
